@@ -1,12 +1,24 @@
 # PieDrop
 
+**Drop Finder-selected files into running AI CLI sessions — macOS menu bar utility**
+
+**一键把 Finder 选中的文件路径投递进终端 AI CLI 会话的 macOS 菜单栏工具**
+
+![Release](https://img.shields.io/github/v/release/Ezreal777/PieDrop) ![License](https://img.shields.io/badge/license-MIT-blue) ![Platform](https://img.shields.io/badge/platform-macOS%2013%2B-black) ![Arch](https://img.shields.io/badge/arch-Apple%20Silicon%20%7C%20Intel-lightgrey)
+
 <p align="center">
-  <img src="docs/screenshot.png" width="680" alt="PieDrop 光环模式面板">
+  <img src="docs/screenshot.png" width="680" alt="PieDrop 光环模式面板：左侧磨砂圆盘按 CLI 着色列出正在运行的会话（qodercli / codex），右侧是该会话的结构化卡片">
 </p>
 
-把 Finder 里选中的文件，用快捷键「投递」进正在运行的终端 CLI 会话输入框的 macOS 菜单栏小工具。
+用 Claude Code、Codex CLI、Gemini CLI 这类 AI 编程工具时，经常要让 AI 处理刚在 Finder 里看到的文件：手动敲一长串路径太累，把文件拖进终端会带出转义字符，复制路径再粘贴又要来回切窗口。PieDrop 把这件事变成一步——
 
-让 AI CLI 处理文件时，不用再手动敲一长串路径：Finder 选中文件 → 按快捷键 → 弹出圆盘，列出当前正在运行的 CLI 会话 → 点一下目标扇区，路径就追加进那个会话的输入框（光标处插入，不自动发送）。
+**Finder 选中文件 → 按快捷键 → 弹出圆盘列出正在运行的 CLI 会话 → 点一下目标扇区**，路径就追加进那个会话的输入框（光标处插入，不自动发送）。
+
+## 适用场景
+
+- **给 AI 会话追加文件上下文**：Claude Code / Codex / qodercli 对话里快速引用 Finder 中的代码、设计稿、日志、数据文件
+- **多会话并行**：同时开着多个 agent 会话时，hover 预览每个会话正在做的任务，精准选择投递目标
+- **终端命令引用文件**：空闲的 zsh / bash / fish 终端也能投，写 `cat`、`open`、`grep` 命令时不用再打路径
 
 ## 特性
 
@@ -15,6 +27,7 @@
 - **会话发现**：`ps` 扫描 agent 进程 × 终端窗口按 TTY 精确配对，空闲 shell 终端也能投递
 - **双通道注入**：iTerm2 直接 write text（免聚焦）；Terminal.app 剪贴板 + 模拟 ⌘V
 - **可自定义**：快捷键（默认 ⌃⌥F）、开机自启、面板样式，都在菜单栏图标里调整
+- **双架构**：Apple Silicon 与 Intel Mac 通用（universal binary）
 - **本地运行**：无网络访问、无数据收集、无后台服务
 
 ## 支持的会话
