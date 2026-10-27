@@ -24,6 +24,7 @@ When working with AI coding tools like Claude Code, Codex CLI, or Gemini CLI, yo
 
 - **Halo mode**: frosted-glass "circle + card" panel — a dial of CLI-colored sectors on the left, a structured session card (task / terminal / unsent draft) on the right
 - **Menu mode**: compact list style that expands on hover
+- **Draft-aware ordering**: sessions with unsent input float to the top of the list and take a larger sector in the dial — spot the one waiting for your input at a glance
 - **Session discovery**: `ps` scan for agent processes paired with terminal windows by TTY; idle shells work too
 - **Dual-channel injection**: iTerm2 write text (no focus needed); Terminal.app via clipboard + simulated ⌘V
 - **Customizable**: hotkey (default ⌃⌥F), launch at login, panel style — all from the menu bar icon
