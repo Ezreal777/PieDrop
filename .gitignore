@@ -2,5 +2,8 @@
 .build/
 build/
 
+# 发布产物
+dist/
+
 # macOS
 .DS_Store

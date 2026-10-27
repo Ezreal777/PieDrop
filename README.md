@@ -26,15 +26,30 @@ qodercli、claude、codex、gemini、aider、qwen、opencode、crush，以及 zs
 - macOS 13+
 - Swift 5.9 工具链（`swift build`）
 
+## 安装
+
+从 [Releases](https://github.com/Ezreal777/PieDrop/releases) 下载最新的 `PieDrop-x.y.z.dmg`，打开后把 PieDrop 拖进 Applications；或用 Homebrew：
+
+```bash
+brew install --cask ezreal777/tap/pie-drop
+```
+
+### 首次打开提示「无法验证开发者」？
+
+项目用自建证书签名（没有付费开发者账号），首次打开需要手动放行一次：
+
+1. 双击 PieDrop，提示无法验证时点「完成」
+2. 打开 系统设置 → 隐私与安全性，底部会出现「PieDrop 已被阻止」，点「仍要打开」
+3. 按启动提示授权 辅助功能 与 自动化（Finder / 终端）权限，之后即可正常使用
+
 ## 构建与安装
 
 ```bash
-git clone <repo-url>
-cd clipie
-./scripts/build-app.sh
+git clone https://github.com/Ezreal777/PieDrop
+cd PieDrop
+./scripts/build-app.sh              # 开发模式：构建并安装到 /Applications
+./scripts/build-app.sh --release    # 发布模式：产出 universal DMG 到 dist/
 ```
-
-脚本会编译 release、组装 .app、签名并安装到 `/Applications/PieDrop.app`。
 
 ### 签名说明
 
