@@ -33,6 +33,10 @@ final class DiskPanel: NSPanel {
     private var draftCache: [String: String?] = [:]
     private(set) var mode: Mode
     var anchor: NSPoint = .zero
+    private weak var dialView: DiskDialView?
+    private weak var previewCard: PreviewCardView?
+    fileprivate weak var menuView: MenuView?
+    fileprivate static let isDemo = CommandLine.arguments.contains("--demo")
 
     // 光环：内容面板 396×160（左圆右方），窗口四周留 haloPad 画自绘阴影；背景为磨砂玻璃
     static let haloPad: CGFloat = 24
@@ -146,6 +150,7 @@ final class DiskPanel: NSPanel {
                                     sessions: sessions)
             dial.onDeliver = { [weak self] idx in self?.deliver(idx) }
             vev.addSubview(dial)
+            dialView = dial
 
             let divider = NSBox()
             divider.boxType = .separator
@@ -159,10 +164,11 @@ final class DiskPanel: NSPanel {
                 card.showNeutral()
                 dial.onHover = { [weak self, weak card] session in
                     guard let self = self, let card = card, let session = session else { return }
-                    card.update(session: session, draft: self.draft(for: session))
+                    card.update(session: session, draft: self.cachedDraft(for: session))
                 }
             }
             vev.addSubview(card)
+            previewCard = card
 
             host.addSubview(wrap)
             host.circleHit = (center: Self.haloDiskCenter, radius: DiskDialView.dialR + 2)
@@ -188,9 +194,10 @@ final class DiskPanel: NSPanel {
 
             let menu = MenuView(frame: NSRect(x: 0, y: 0, width: 300, height: cardH),
                                 sessions: sessions,
-                                draftProvider: { [weak self] s in self?.draft(for: s) ?? nil })
+                                draftProvider: { [weak self] s in self?.cachedDraft(for: s) ?? nil })
             menu.onPick = { [weak self] idx in self?.deliver(idx) }
             vev.addSubview(menu)
+            menuView = menu
 
             host.addSubview(wrap)
             host.keepRects = [wrap.frame]
@@ -201,11 +208,77 @@ final class DiskPanel: NSPanel {
 
     /// 草稿读取按会话缓存（每次弹出面板时刷新一次）
     private func draft(for s: CliSession) -> String? {
+        // --demo 模式：假会话配假草稿，便于预览"有输入"的标识与重排；
+        // 其余假会话不做真实草稿读取（避免 tell 把未运行的终端 App 拉起）
+        if Self.isDemo {
+            let fake: String?
+            if s.tty == "ttys101" {
+                fake = "帮我把这份日志按天汇总"
+            } else if s.tty == "ttys102" {
+                fake = "refactor the parser module"
+            } else {
+                fake = nil
+            }
+            draftCache[s.tty] = fake   // 写入缓存，供 applyInputAwareLayout 读取
+            return fake
+        }
         let key = s.tty
         if let cached = draftCache[key] { return cached }
         let result = DraftReader.draft(kind: s.terminalKind, tty: s.tty)
         draftCache[key] = result
         return result
+    }
+
+    /// 只读缓存版：绝不触发 AppleScript（hover / 卡片路径专用，保证主线程不被阻塞）。
+    /// 预取未到的会话先返回 nil，预取每完成一个会话经 pushDraftUpdate 推送刷新。
+    private func cachedDraft(for s: CliSession) -> String? {
+        if Self.isDemo { return draft(for: s) }   // demo 假草稿无阻塞，直接走原路
+        return draftCache[s.tty] ?? nil
+    }
+
+    /// 弹出后预取全部会话草稿：osascript 子进程在后台队列并行执行，主线程零阻塞
+    /// （AppleScript 单次 50~200ms，之前主线程分块执行会在弹出后一秒内造成掉帧）。
+    /// 每读完一个即时推送刷新，全部到齐后按"是否有输入"重排扇区角度 / 列表顺序。
+    func prefetchDraftsAndReLayout() {
+        guard !sessions.isEmpty else { return }
+        let group = DispatchGroup()
+        for s in sessions {
+            group.enter()
+            DispatchQueue.global(qos: .userInteractive).async { [weak self] in
+                var result: String?
+                if self != nil, !DiskPanel.isDemo {
+                    result = DraftReader.draft(kind: s.terminalKind, tty: s.tty)
+                }
+                DispatchQueue.main.async { [weak self] in
+                    guard let self else { group.leave(); return }
+                    if DiskPanel.isDemo {
+                        _ = self.draft(for: s)          // demo 假草稿走原路写入缓存
+                    } else {
+                        self.draftCache[s.tty] = result
+                    }
+                    self.pushDraftUpdate(for: s)
+                    group.leave()
+                }
+            }
+        }
+        group.notify(queue: .main) { [weak self] in self?.applyInputAwareLayout() }
+    }
+
+    /// 把预取结果应用到两种样式：圆盘加权角度 + 标识点；列表置顶排序 + 标识点
+    private func applyInputAwareLayout() {
+        let flags = sessions.map { s in (draftCache[s.tty] ?? nil) != nil }
+        NSLog("draft prefetch done: \(sessions.indices.filter { flags[$0] }.map { sessions[$0].tty }.joined(separator: ","))")
+        dialView?.updateHasInput(flags)
+        menuView?.applyHasInput(flags)
+    }
+
+    /// 单个会话草稿读完即时推送（不等全部到齐）：刷新列表行文字；
+    /// 圆盘右侧卡片若正悬停该会话，也一并刷新
+    private func pushDraftUpdate(for s: CliSession) {
+        menuView?.refreshDraft(for: s)
+        if let hs = dialView?.hoveredSession, hs.tty == s.tty {
+            previewCard?.update(session: hs, draft: cachedDraft(for: hs))
+        }
     }
 
     override var canBecomeKey: Bool { false }
@@ -246,6 +319,23 @@ final class DiskPanelController {
         p.refreshFrame()
         NSLog("PieDrop present anchor=\(p.anchor) mode=\(mode.rawValue) frame=\(p.frame)")
         p.orderFrontRegardless()
+        p.prefetchDraftsAndReLayout()
+        // demo：hover 自测扫掠（6pt 步进下滑到第三行再回滑），模拟真实滑动，
+        // 验证命中序列为 行1→行2→行3→行2→行1（无跳行、缝隙不塌缩）
+        if DiskPanel.isDemo, p.mode == .menu, let mv = p.menuView {
+            let cardH = DiskPanel.windowSize(for: .menu, sessionCount: sessions.count).height - 80
+            let cx: CGFloat = 150
+            var pts: [NSPoint] = []
+            var y = cardH - 42
+            while y >= cardH - 165 { pts.append(NSPoint(x: cx, y: y)); y -= 6 }
+            y += 12
+            while y <= cardH - 42 { pts.append(NSPoint(x: cx, y: y)); y += 6 }
+            for (i, pt) in pts.enumerated() {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0 + Double(i) * 0.07) { [weak mv] in
+                    mv?.updateHoverForLocation(pt, stepping: true)
+                }
+            }
+        }
         isVisible = true
         outsideMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { [weak self] _ in
             self?.dismiss()

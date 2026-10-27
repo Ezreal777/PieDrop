@@ -53,7 +53,8 @@ enum DraftReader {
             end tell
             """
         }
-        return ScriptRunner.appleScript(script)
+        // osascript 子进程执行：线程安全，预取可放到后台队列，主线程零阻塞
+        return ScriptRunner.osascript(script)
     }
 
     /// 草稿 = 屏幕尾部最后一行 "> " 提示符后面的文本；空输入/占位符返回 nil

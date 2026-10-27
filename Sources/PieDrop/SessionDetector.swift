@@ -17,6 +17,8 @@ struct CliSession {
     let itermSessionId: String?
 
     var label: String { cliName }
+    /// 圆盘扇区里的短标签（qodercli 太长会溢出，显示为 Qoder）
+    var shortLabel: String { cliName == "qodercli" ? "Qoder" : cliName }
     var cwdName: String { (cwd as NSString).lastPathComponent }
     var detail: String {
         let app = terminalKind == .iTerm ? "iTerm2" : "Terminal.app"
@@ -45,16 +47,18 @@ enum SessionDetector {
         let (agents, shells) = scanProcesses()
         let termSessions = enumerateTerminalSessions()
         NSLog("detect: agents=\(agents.count) shells=\(shells.count) termSessions=\(termSessions.count) ttys=\(termSessions.map { $0.tty }.joined(separator: ","))")
+        // 一次 lsof 批量取全部 cwd（原来每个 pid 单独调用，窗口多时显著拖慢呼出）
+        let shellPids = termSessions.compactMap { t in shells[t.tty]?.pid }
+        let cwds = workingDirectories(pids: agents.map { $0.pid } + shellPids)
         var out: [CliSession] = []
         var matched = Set<String>()
         for p in agents {
             guard let t = termSessions.first(where: { $0.tty == p.tty }) else { continue }
             matched.insert(p.tty)
-            let cwd = workingDirectory(pid: p.pid) ?? "~"
             out.append(CliSession(pid: p.pid,
                                   cliName: p.name,
                                   tty: p.tty,
-                                  cwd: cwd,
+                                  cwd: cwds[p.pid] ?? "~",
                                   terminalKind: t.kind,
                                   windowTitle: t.title,
                                   itermSessionId: t.itermId))
@@ -62,11 +66,10 @@ enum SessionDetector {
         // 空闲终端：跑着 shell 但没有 agent CLI，也给出扇区（投路径进 shell 命令行）
         for t in termSessions where !matched.contains(t.tty) {
             guard let s = shells[t.tty] else { continue }
-            let cwd = workingDirectory(pid: s.pid) ?? "~"
             out.append(CliSession(pid: s.pid,
                                   cliName: s.name,
                                   tty: t.tty,
-                                  cwd: cwd,
+                                  cwd: cwds[s.pid] ?? "~",
                                   terminalKind: t.kind,
                                   windowTitle: t.title,
                                   itermSessionId: t.itermId))
@@ -120,12 +123,24 @@ enum SessionDetector {
     }
 
     static func workingDirectory(pid: pid_t) -> String? {
-        guard let out = ScriptRunner.shell("/usr/sbin/lsof", ["-a", "-p", "\(pid)", "-d", "cwd", "-Fn"]) else { return nil }
-        for line in out.components(separatedBy: "\n") where line.hasPrefix("n") {
-            let path = String(line.dropFirst())
-            if path.hasPrefix("/") { return path }
+        workingDirectories(pids: [pid])[pid]
+    }
+
+    /// 一次 lsof 批量查多个 pid 的工作目录（lsof 单次 ~50ms，逐个查在窗口多时拖慢呼出）
+    static func workingDirectories(pids: [pid_t]) -> [pid_t: String] {
+        guard !pids.isEmpty else { return [:] }
+        let set = pids.map(String.init).joined(separator: ",")
+        guard let out = ScriptRunner.shell("/usr/sbin/lsof", ["-a", "-p", set, "-d", "cwd", "-Fn"]) else { return [:] }
+        var result: [pid_t: String] = [:]
+        var cur: pid_t?
+        for line in out.components(separatedBy: "\n") {
+            if line.hasPrefix("p"), let pid = pid_t(line.dropFirst()) {
+                cur = pid
+            } else if line.hasPrefix("n"), let pid = cur, line.dropFirst().hasPrefix("/") {
+                result[pid] = String(line.dropFirst())
+            }
         }
-        return nil
+        return result
     }
 
     // MARK: - 终端窗口枚举

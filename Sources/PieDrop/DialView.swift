@@ -6,6 +6,8 @@ final class DiskDialView: NSView {
     static let dialR: CGFloat = 80           // 圆盘半径（面板左侧即为该圆）
     var onHover: ((CliSession?) -> Void)?
     var onDeliver: ((Int) -> Void)?
+    /// 当前悬停的会话（草稿预取推送刷新右侧卡片用）
+    var hoveredSession: CliSession? { hoveredIndex.map { sessions[$0] } }
 
     private let sessions: [CliSession]
     private let r1: CGFloat = 70
@@ -15,7 +17,15 @@ final class DiskDialView: NSView {
     private var hoveredIndex: Int? { didSet { updateHover() } }
     private var sectorContainers: [CALayer] = []
     private var pathLayers: [CAShapeLayer] = []
+    private var rotators: [CALayer] = []
+    private var labelLayers: [CATextLayer] = []
     private var tracking: NSTrackingArea?
+    /// 各会话输入框是否有未发送草稿（草稿预取完成后由面板写入）
+    private var hasInput: [Bool] = []
+    /// 各扇区角度跨度（按 hasInput 加权分配）
+    private var spans: [Double] = []
+    /// 有草稿的扇区角度权重（无草稿为 1.0）
+    private static let hasInputWeight: Double = 1.6
 
     init(frame: NSRect, sessions: [CliSession]) {
         self.sessions = sessions
@@ -68,17 +78,79 @@ final class DiskDialView: NSView {
         halo.zPosition = 0
         root.addSublayer(halo)
 
+        rebuildSectors()
+        buildCenter()
+    }
+
+    /// 草稿预取完成后由面板调用：hasInput[i] = 会话 i 输入框是否有未发送内容。
+    /// 稍等面板首帧渲染完成再启动动画，避免与弹出布局争抢造成掉帧。
+    func updateHasInput(_ flags: [Bool]) {
+        guard flags.count == sessions.count, flags != hasInput else { return }
+        hasInput = flags
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+            self?.animateToWeightedLayout()
+        }
+    }
+
+    /// 等分 → 加权角度的平滑过渡：扇区路径做隐式动画，标签沿弧线同步滑动
+    /// （旋转层正向转 + 文字反向转，净旋转恒为 0，文字始终水平）。
+    private func animateToWeightedLayout() {
         let n = sessions.count
-        if n == 0 {
-            buildCenter()
+        guard n > 1, pathLayers.count == n, labelLayers.count == n, rotators.count == n, sectorContainers.count == n else {
+            rebuildSectors()   // 结构不完整时退化为重建
             return
         }
-        let span = 360.0 / Double(n)
+        let weights = hasInput.map { $0 ? Self.hasInputWeight : 1.0 }
+        let total = weights.reduce(0, +)
+        spans = weights.map { 360.0 * $0 / total }
+
+        CATransaction.begin()
+        CATransaction.setAnimationDuration(0.35)
+        CATransaction.setAnimationTimingFunction(CAMediaTimingFunction(name: .easeOut))
+        hoveredIndex = nil
+        var start = -90.0
+        for i in 0..<n {
+            let b0 = start
+            let b1 = start + spans[i]
+            start = b1
+            let newPath = sectorPath(b0, b1, r0, r1)
+            pathLayers[i].path = newPath
+            sectorContainers[i].shadowPath = newPath
+            let rot = CGFloat(((b0 + b1) / 2) * .pi / 180)
+            rotators[i].transform = CATransform3DMakeRotation(rot, 0, 0, 1)
+            labelLayers[i].transform = CATransform3DMakeRotation(-rot, 0, 0, 1)
+        }
+        CATransaction.commit()
+    }
+
+    /// 依据当前 hasInput 重建全部扇区（角度加权；全有/全无时退化为等分）
+    private func rebuildSectors() {
+        guard let root = layer else { return }
+        for c in sectorContainers { c.removeFromSuperlayer() }
+        sectorContainers.removeAll()
+        pathLayers.removeAll()
+        rotators.removeAll()
+        labelLayers.removeAll()
+        hoveredIndex = nil
+
+        let n = sessions.count
+        guard n > 0 else { return }
+        if hasInput.count != n { hasInput = Array(repeating: false, count: n) }
+        let weights = hasInput.map { $0 ? Self.hasInputWeight : 1.0 }
+        let total = weights.reduce(0, +)
+        spans = weights.map { 360.0 * $0 / total }
+
+        CATransaction.begin()
+        CATransaction.setAnimationDuration(0.25)
+        CATransaction.setAnimationTimingFunction(CAMediaTimingFunction(name: .easeOut))
+        CATransaction.setDisableActions(true)
+        var start = -90.0
         for i in 0..<n {
             let s = sessions[i]
-            let a0 = -90.0 + Double(i) * span
-            let a1 = a0 + span
-            let mid = a0 + span / 2
+            let b0 = start
+            let b1 = start + spans[i]
+            let mid = (b0 + b1) / 2
+            start = b1
             let fillColor = Palette.fill(for: s.cliName)
             let textColor = Palette.text(for: s.cliName)
 
@@ -91,7 +163,7 @@ final class DiskDialView: NSView {
             container.shadowOpacity = 0
 
             let shape = CAShapeLayer()
-            shape.path = n == 1 ? annulusPath() : sectorPath(a0, a1, r0, r1)
+            shape.path = n == 1 ? annulusPath() : sectorPath(b0, b1, r0, r1)
             shape.fillRule = .evenOdd
             shape.fillColor = fillColor.withAlphaComponent(0.13).cgColor
             shape.lineWidth = 0
@@ -99,26 +171,36 @@ final class DiskDialView: NSView {
             container.addSublayer(shape)
             pathLayers.append(shape)
 
-            // 扇区标签：CLI 名
-            let lp = polar((r0 + r1) / 2, mid)
-            let nameAttr = NSAttributedString(string: s.label, attributes: [
+            // 扇区标签：挂在旋转层上（锚点=圆心），文字自身反向旋转保持水平。
+            // 角度变化时对旋转层做动画，文字沿弧线运动、与扇区边界逐帧同步。
+            let rotator = CALayer()
+            rotator.bounds = CGRect(x: 0, y: 0, width: Self.dialR * 2, height: Self.dialR * 2)
+            rotator.position = CGPoint(x: Self.dialR, y: Self.dialR)
+            rotator.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+            rotator.transform = CATransform3DMakeRotation(CGFloat(mid * .pi / 180), 0, 0, 1)
+            container.addSublayer(rotator)
+            rotators.append(rotator)
+
+            let nameAttr = NSAttributedString(string: s.shortLabel, attributes: [
                 .font: NSFont.systemFont(ofSize: 11, weight: .medium),
                 .foregroundColor: textColor,
             ])
             let nameLayer = CATextLayer()
             nameLayer.string = nameAttr
             nameLayer.contentsScale = scale
+            nameLayer.anchorPoint = CGPoint(x: 0.5, y: 0.5)
             let ns = nameAttr.size()
-            nameLayer.frame = CGRect(x: lp.x - ns.width / 2 - 3, y: lp.y - ns.height / 2 - 3,
-                                     width: ns.width + 6, height: ns.height + 6)
-            container.addSublayer(nameLayer)
+            nameLayer.bounds = CGRect(x: 0, y: 0, width: ns.width + 6, height: ns.height + 6)
+            nameLayer.position = CGPoint(x: Self.dialR + (r0 + r1) / 2, y: Self.dialR)
+            nameLayer.transform = CATransform3DMakeRotation(CGFloat(-mid * .pi / 180), 0, 0, 1)
+            rotator.addSublayer(nameLayer)
+            labelLayers.append(nameLayer)
 
             container.shadowPath = shape.path
             root.addSublayer(container)
             sectorContainers.append(container)
         }
-
-        buildCenter()
+        CATransaction.commit()
     }
 
     /// 中心留空：素圆 + 一颗小灰点（不放字）
@@ -153,20 +235,19 @@ final class DiskDialView: NSView {
         if n == 1 { return 0 }
         var ang = atan2(Double(dy), Double(dx)) * 180 / .pi
         if ang < 0 { ang += 360 }
-        let step = 360.0 / Double(n)
         // 缝隙恒宽：命中判定按当前半径换算缝的半角
         let halfGap = asin(min(1, Double(gapWidth / 2) / dist)) * 180 / .pi
+        // 扇区按累积跨度匹配（支持变角度）；取模处理跨 0° 的扇区
+        var start = -90.0
         for i in 0..<n {
-            let b0 = -90.0 + Double(i) * step
-            var s = b0 + halfGap
-            var e = b0 + step - halfGap
-            while s < 0 { s += 360 }
-            while e < 0 { e += 360 }
-            if s <= e {
-                if ang >= s && ang <= e { return i }
-            } else {
-                if ang >= s || ang <= e { return i }   // 跨 0° 的扇区
+            let span = i < spans.count ? spans[i] : 360.0 / Double(n)
+            let inner = span - 2 * halfGap
+            if inner > 0 {
+                var rel = (ang - (start + halfGap)).truncatingRemainder(dividingBy: 360)
+                if rel < 0 { rel += 360 }
+                if rel <= inner { return i }
             }
+            start += span
         }
         return nil
     }
