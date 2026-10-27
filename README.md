@@ -1,5 +1,7 @@
 # PieDrop
 
+**中文** | [English](README.en.md) | [日本語](README.ja.md) | [한국어](README.ko.md)
+
 **Drop Finder-selected files into running AI CLI sessions — macOS menu bar utility**
 
 **一键把 Finder 选中的文件路径投递进终端 AI CLI 会话的 macOS 菜单栏工具**
