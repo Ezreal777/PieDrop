@@ -32,6 +32,7 @@ qodercli、claude、codex、gemini、aider、qwen、opencode、crush，以及 zs
 
 ```bash
 brew install --cask ezreal777/tap/pie-drop
+# 首次安装会提示信任第三方 tap，按提示确认即可
 ```
 
 ### 首次打开提示「无法验证开发者」？
