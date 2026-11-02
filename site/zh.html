@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PieDrop — 一键把文件投递进 AI CLI 会话</title>
+  <meta name="description" content="macOS 菜单栏工具：Finder 选中文件，按快捷键弹出圆盘，点一下扇区，路径就追加进正在运行的 Claude Code / Codex / Gemini CLI 会话输入框。">
+  <meta name="theme-color" content="#fafaf8">
+  <link rel="icon" href="icon.png" type="image/png">
+  <link rel="stylesheet" href="styles.css">
+  <script src="site.js" defer></script>
+  <link rel="alternate" hreflang="en" href="./">
+  <link rel="alternate" hreflang="zh-CN" href="zh.html">
+</head>
+<body>
+<header><nav aria-label="主导航"><a class="brand" href="zh.html"><img src="icon.png" alt="PieDrop" width="28" height="28">PieDrop<span>.</span></a><div class="nav-links"><a class="section-link" href="#how">工作流程</a><a class="section-link" href="#features">特性</a><a class="section-link" href="#start">快速开始</a><a href="https://github.com/Ezreal777/PieDrop">GitHub ↗</a><a class="lang" href="./" lang="en" aria-label="Switch to English">English</a></div></nav></header>
+<main class="wrap">
+
+  <div class="hero">
+    <div>
+      <span class="eyebrow">macOS 菜单栏 · Finder → AI CLI</span>
+      <h1>把文件，<em>投递</em>给 AI 会话。</h1>
+      <p class="lead">Finder 里选好文件，按下快捷键，点一下扇区——路径就出现在正在运行的 AI CLI 会话输入框里。不打路径、不拖转义、不切窗口。</p>
+      <div class="buttons"><a class="button" href="https://github.com/Ezreal777/PieDrop/releases/latest">下载 PieDrop ↗</a><a class="button secondary" href="#start">快速开始 →</a></div>
+      <p class="note">macOS 13+ · Apple Silicon 与 Intel · 默认快捷键 <kbd>⌃⌥F</kbd> · 本地运行，无网络访问</p>
+    </div>
+
+    <div class="mock-stack">
+      <div class="panel" aria-label="光环面板示意">
+        <div class="panel-disc">
+          <div class="disc" role="group" aria-label="会话圆盘示意，可交互" data-sessions='{"qodercli":{"name":"qodercli","tint":"#8b7cf624","ink":"#6155c9","title":"重构 Injector.swift 注入通道","term":"iTerm2","tty":"ttys004","draft":"把 docs/ 里的截图换成新面板样式","path":"~/Projects/piedrop/docs/screenshot.png","hint":"点击扇区，路径会插入到这个会话的输入框"},"codex":{"name":"codex","tint":"#3fc4b426","ink":"#1f8e81","title":"给 SessionDetector 补单元测试","term":"Terminal.app","tty":"ttys002","draft":null,"path":"~/Projects/piedrop/Tests/SessionDetectorTests.swift","hint":"点击扇区，路径会插入到这个会话的输入框"},"claude":{"name":"claude","tint":"#e08a5f26","ink":"#b05e30","title":"review PR #12 的并发改动","term":"iTerm2","tty":"ttys001","draft":null,"path":"~/Projects/piedrop/Sources/PieDrop/DraftReader.swift","hint":"点击扇区，路径会插入到这个会话的输入框"}}'>
+            <svg viewBox="0 0 240 240">
+              <path class="sector" data-cli="qodercli" tabindex="0" role="button" aria-label="qodercli 会话，有未发送草稿" d="M120,120 L19.5,93.1 A104,104 0 0 1 220.5,93.1 Z" fill="#8b7cf6" fill-opacity="0.32" stroke="#f7f6f3" stroke-width="5"/>
+              <path class="sector" data-cli="codex" tabindex="0" role="button" aria-label="codex 会话" d="M120,120 L222.7,103.8 A104,104 0 0 1 118.2,224.0 Z" fill="#3fc4b4" fill-opacity="0.32" stroke="#f7f6f3" stroke-width="5"/>
+              <path class="sector" data-cli="claude" tabindex="0" role="button" aria-label="claude 会话" d="M120,120 L107.3,223.3 A104,104 0 0 1 17.3,103.8 Z" fill="#e08a5f" fill-opacity="0.32" stroke="#f7f6f3" stroke-width="5"/>
+              <text class="sector-label" data-for="qodercli" x="120" y="56" text-anchor="middle" fill="#6155c9">qodercli</text>
+              <text class="sector-label" data-for="codex" x="171" y="166" text-anchor="middle" fill="#1f8e81">codex</text>
+              <text class="sector-label" data-for="claude" x="66" y="162" text-anchor="middle" fill="#b05e30">claude</text>
+              <circle cx="120" cy="120" r="40" fill="#ffffff" stroke="rgba(0,0,0,0.05)"/>
+              <circle cx="120" cy="120" r="4" fill="#98989d"/>
+            </svg>
+          </div>
+        </div>
+        <div class="panel-divider"></div>
+        <div class="panel-card">
+          <div class="card-empty">悬停扇区查看会话</div>
+          <div class="card-full">
+            <div class="session-head">
+              <span class="session-name"></span>
+              <span class="session-tty"></span>
+            </div>
+            <div class="session-title"></div>
+            <div class="session-rows">
+              <div class="row row-terminal"><span class="k">终端</span><span class="v"></span></div>
+              <div class="row row-draft"><span class="k">草稿</span><span class="v"></span></div>
+            </div>
+            <div class="session-hint"></div>
+          </div>
+        </div>
+      </div>
+      <div class="term" aria-label="终端输入示意">
+        <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="term-title">claude — zsh — 120×30</span></div>
+        <div class="term-body">
+          <div class="term-line"><span class="prompt">❯ claude</span><span class="typed"></span><span class="cursor"></span></div>
+        </div>
+        <div class="term-hint">↑ 交互示意：悬停 / 点击扇区，路径在光标处插入，不自动发送</div>
+      </div>
+      <p class="mock-caption">qodercli 有未发送草稿 → 扇区更大、卡片置顶提示</p>
+    </div>
+  </div>
+
+  <div class="strip"><span><b>01</b> 一键投递</span><span><b>02</b> 草稿感知排序</span><span><b>03</b> 双通道注入</span><span><b>04</b> 完全本地运行</span></div>
+
+  <section id="how"><span class="eyebrow">从选中到投递</span><h2>四步，一气呵成。</h2><p class="section-intro">为「刚在 Finder 里看到、马上想让 AI 处理」的时刻设计，中间不需要碰键盘打字。</p><div class="workflow"><div class="step"><b>01 / FINDER</b><h3>选中文件</h3><p>在 Finder 选中一个或多个文件：代码、设计稿、日志、数据文件都行。</p></div><div class="step"><b>02 / ⌃⌥F</b><h3>唤起圆盘</h3><p>全局快捷键随时唤起光环面板。默认 <kbd>⌃⌥F</kbd>，可在菜单栏自定义。</p></div><div class="step"><b>03 / HOVER</b><h3>预览会话</h3><p>扇区按 CLI 着色，悬停预览右侧卡片：任务缩略、所属终端、未发送草稿。</p></div><div class="step"><b>04 / CLICK</b><h3>路径落位</h3><p>点击扇区，路径在目标会话输入框的光标处插入——不自动发送，是否回车由你决定。</p></div></div></section>
+
+  <section id="features"><span class="eyebrow">为多会话并行设计</span><h2>细节都为「选得准」。</h2><p class="section-intro">同时开着多个 agent 会话是常态。PieDrop 的一切设计，都是为了让你在一秒内把文件交给正确的那个。</p><div class="grid">
+    <article class="card"><span class="tag">01 / 光环模式</span><h3>左圆右方，磨砂玻璃</h3><p>左侧是按 CLI 着色的扇区圆盘，右侧是当前会话的结构化卡片：任务缩略、终端、未发送草稿。</p></article>
+    <article class="card"><span class="tag">02 / 菜单模式</span><h3>紧凑列表样式</h3><p>偏好列表就切换到菜单模式，hover 展开任务缩略与草稿详情，空间紧张时更省事。</p></article>
+    <article class="card"><span class="tag">03 / 草稿感知</span><h3>正等你输入的那个，置顶</h3><p>有未发送输入的会话在列表中置顶、在圆盘中获得更大的扇区角度，多会话并行时一眼锁定。</p></article>
+    <article class="card"><span class="tag">04 / 会话发现</span><h3>进程 × TTY 精确配对</h3><p><code>ps</code> 扫描 agent 进程，与终端窗口按 TTY 配对。空闲的 zsh / bash / fish 终端也能投。</p></article>
+    <article class="card"><span class="tag">05 / 双通道注入</span><h3>iTerm2 免聚焦直写</h3><p>iTerm2 直接 write text；Terminal.app 走剪贴板 + 模拟 <kbd>⌘V</kbd>。两条通道按终端自动选择。</p></article>
+    <article class="card"><span class="tag">06 / 本地与可自定义</span><h3>数据不出机器</h3><p>无网络访问、无数据收集、无后台服务。快捷键、开机自启、面板样式都在菜单栏图标里调整。</p></article>
+  </div>
+  <figure class="figure"><img src="screenshot.png" alt="PieDrop 光环模式实机截图：左侧磨砂圆盘按 CLI 着色列出正在运行的会话，右侧是该会话的结构化卡片" loading="lazy"><figcaption>光环模式实机截图 · 由 <code>--demo</code> 免权限演示模式生成</figcaption></figure>
+  </section>
+
+  <section id="sessions"><span class="eyebrow">支持这些会话</span><h2>常驻 CLI 都在列。</h2><div class="setup">
+    <article><h3>AI CLI 会话</h3><div class="platforms"><span class="platform"><b class="mark" style="background:var(--qodercli)">Q</b>qodercli</span><span class="platform"><b class="mark" style="background:var(--claude)">C</b>claude</span><span class="platform"><b class="mark" style="background:var(--codex)">CX</b>codex</span><span class="platform"><b class="mark" style="background:var(--gemini)">G</b>gemini</span><span class="platform"><b class="mark" style="background:var(--aider)">A</b>aider</span><span class="platform"><b class="mark">q</b>qwen</span><span class="platform"><b class="mark">oc</b>opencode</span><span class="platform"><b class="mark">cr</b>crush</span></div><p>以上 CLI 由进程扫描自动识别、按各自的着色显示。未列出的 CLI 进程也可能被识别为通用 agent 会话。</p></article>
+    <article><h3>终端与注入通道</h3><div class="platforms"><span class="platform"><b class="mark" style="background:#4a9cf0">it</b>iTerm2</span><span class="platform"><b class="mark" style="background:#1d1d1f">T</b>Terminal.app</span><span class="platform"><b class="mark">zsh</b>zsh</span><span class="platform"><b class="mark">bash</b>bash</span><span class="platform"><b class="mark">fish</b>fish</span></div><p>iTerm2 免聚焦直接写入输入框；Terminal.app 通过剪贴板 + 模拟 <kbd>⌘V</kbd> 注入。空闲 shell 终端同样可投——写 <code>cat</code>、<code>open</code>、<code>grep</code> 时不用再打路径。</p></article>
+  </div><p class="note">支持范围以实际识别结果为准，取决于终端与 CLI 的版本。</p></section>
+
+  <section id="start"><span class="eyebrow">快速开始</span><h2>一分钟装好。</h2><div class="install-grid">
+    <div class="install-card">
+      <h3>下载 DMG</h3>
+      <p>从 Releases 下载最新的 <code>PieDrop-x.y.z.dmg</code>，打开后把 PieDrop 拖进 Applications 即可。</p>
+      <div class="buttons"><a class="button" href="https://github.com/Ezreal777/PieDrop/releases/latest">下载最新 DMG ↗</a></div>
+    </div>
+    <div class="install-card">
+      <h3>Homebrew 安装</h3>
+      <p>已配好第三方 tap，一条命令安装：</p>
+      <pre class="codeblock"><code>brew install --cask ezreal777/tap/pie-drop
+<span class="cmt"># 首次安装会提示信任第三方 tap，按提示确认即可</span></code><button class="copy-btn" data-copy data-copied-label="已复制">复制</button></pre>
+    </div>
+  </div>
+  <h3 class="manual-install-title">首次打开，需要放行一次</h3>
+  <p class="section-intro">项目用自建证书签名（没有付费开发者账号），macOS 会拦第一次。放行之后重新编译、升级都不会再拦。</p>
+  <ol class="steps-list">
+    <li>双击 PieDrop，提示「无法验证开发者」时点「完成」</li>
+    <li>打开 <strong>系统设置 → 隐私与安全性</strong>，点底部「PieDrop 已被阻止」旁的「仍要打开」</li>
+    <li>按启动提示授权 <strong>辅助功能</strong> 与 <strong>自动化</strong>（Finder / 终端）权限，之后即可正常使用</li>
+  </ol>
+  <ul class="perm-list">
+    <li><b>辅助功能</b><span>向 Terminal.app 模拟 <kbd>⌘V</kbd> 粘贴路径</span></li>
+    <li><b>自动化（Finder）</b><span>读取当前选中的文件</span></li>
+    <li><b>自动化（Terminal · iTerm2）</b><span>定位会话窗口、写入输入框</span></li>
+  </ul>
+  <p class="note">App 完全本地运行：不上网、不收集数据；草稿预览只读取终端屏幕尾部最后一条未发送输入。</p>
+  </section>
+
+  <section><span class="eyebrow">使用前的小提示</span><h2>几个实用问题。</h2><div class="faq">
+    <details><summary>路径会被自动发送吗？</summary><p>不会。路径只插入到目标会话输入框的光标处，你可以继续补充一句话再回车，也可以直接删掉。空闲终端里则直接停在命令行上等你编辑。</p></details>
+    <details><summary>为什么需要辅助功能和自动化权限？</summary><p>Terminal.app 通道靠模拟 <kbd>⌘V</kbd> 粘贴（辅助功能）；读取 Finder 选区、定位会话窗口需要自动化授权（Finder / Terminal / iTerm2）。iTerm2 通道则通过其接口直接写入，不依赖模拟按键。</p></details>
+    <details><summary>同时开着很多会话，怎么选得准？</summary><p>扇区按 CLI 着色区分；悬停任意扇区，右侧卡片显示该会话的任务缩略、所属终端和未发送草稿。有草稿的会话还会置顶并获得更大的扇区，通常那就是你正想继续的那个。</p></details>
+    <details><summary>会收集数据吗？</summary><p>完全本地运行：无网络访问、无数据收集、无后台服务。草稿预览只读取终端屏幕尾部最后一条未发送输入，用于会话识别与排序。</p></details>
+  </div></section>
+
+  <div class="closing"><span class="eyebrow">少敲一次路径</span><h2>下一个文件，点一下就到位。</h2><div class="buttons"><a class="button" href="https://github.com/Ezreal777/PieDrop/blob/main/README.md">阅读完整 README ↗</a><a class="button secondary" href="https://github.com/Ezreal777/PieDrop/issues">提问与反馈 ↗</a></div></div>
+
+</main>
+<footer class="wrap"><span>PieDrop · MIT License</span><div><a href="https://github.com/Ezreal777/PieDrop">源代码</a><a href="https://github.com/Ezreal777/PieDrop/releases">Releases</a><a href="./" lang="en">English</a></div></footer>
+</body>
+</html>

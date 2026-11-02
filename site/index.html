@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PieDrop — Drop files into your AI CLI session</title>
+  <meta name="description" content="macOS menu bar utility: select files in Finder, press the hotkey, click a sector — the path lands at the cursor of your running Claude Code / Codex / Gemini CLI session.">
+  <meta name="theme-color" content="#fafaf8">
+  <link rel="icon" href="icon.png" type="image/png">
+  <link rel="stylesheet" href="styles.css">
+  <script src="site.js" defer></script>
+  <link rel="alternate" hreflang="en" href="./">
+  <link rel="alternate" hreflang="zh-CN" href="zh.html">
+</head>
+<body>
+<header><nav aria-label="Main navigation"><a class="brand" href="./"><img src="icon.png" alt="PieDrop" width="28" height="28">PieDrop<span>.</span></a><div class="nav-links"><a class="section-link" href="#how">How it works</a><a class="section-link" href="#features">Features</a><a class="section-link" href="#start">Get started</a><a href="https://github.com/Ezreal777/PieDrop">GitHub ↗</a><a class="lang" href="zh.html" lang="zh-CN" aria-label="切换到中文">中文</a></div></nav></header>
+<main class="wrap">
+
+  <div class="hero">
+    <div>
+      <span class="eyebrow">macOS menu bar · Finder → AI CLI</span>
+      <h1>Drop files <em>straight</em> into your AI session.</h1>
+      <p class="lead">Select files in Finder, press the hotkey, click a sector — the path lands at the cursor of a running AI CLI session. No retyping, no escaped pastes, no window juggling.</p>
+      <div class="buttons"><a class="button" href="https://github.com/Ezreal777/PieDrop/releases/latest">Download PieDrop ↗</a><a class="button secondary" href="#start">Get started →</a></div>
+      <p class="note">macOS 13+ · Apple Silicon &amp; Intel · Default hotkey <kbd>⌃⌥F</kbd> · Runs locally, no network access</p>
+    </div>
+
+    <div class="mock-stack">
+      <div class="panel" aria-label="Halo panel mock">
+        <div class="panel-disc">
+          <div class="disc" role="group" aria-label="Session disc mock, interactive" data-sessions='{"qodercli":{"name":"qodercli","tint":"#8b7cf624","ink":"#6155c9","title":"Refactoring the Injector.swift channels","term":"iTerm2","tty":"ttys004","draft":"update docs/ screenshots to the new panel style","path":"~/Projects/piedrop/docs/screenshot.png","hint":"Click the sector to insert the path into this session"},"codex":{"name":"codex","tint":"#3fc4b426","ink":"#1f8e81","title":"Writing unit tests for SessionDetector","term":"Terminal.app","tty":"ttys002","draft":null,"path":"~/Projects/piedrop/Tests/SessionDetectorTests.swift","hint":"Click the sector to insert the path into this session"},"claude":{"name":"claude","tint":"#e08a5f26","ink":"#b05e30","title":"Reviewing the concurrency changes in PR #12","term":"iTerm2","tty":"ttys001","draft":null,"path":"~/Projects/piedrop/Sources/PieDrop/DraftReader.swift","hint":"Click the sector to insert the path into this session"}}'>
+            <svg viewBox="0 0 240 240">
+              <path class="sector" data-cli="qodercli" tabindex="0" role="button" aria-label="qodercli session, has an unsent draft" d="M120,120 L19.5,93.1 A104,104 0 0 1 220.5,93.1 Z" fill="#8b7cf6" fill-opacity="0.32" stroke="#f7f6f3" stroke-width="5"/>
+              <path class="sector" data-cli="codex" tabindex="0" role="button" aria-label="codex session" d="M120,120 L222.7,103.8 A104,104 0 0 1 118.2,224.0 Z" fill="#3fc4b4" fill-opacity="0.32" stroke="#f7f6f3" stroke-width="5"/>
+              <path class="sector" data-cli="claude" tabindex="0" role="button" aria-label="claude session" d="M120,120 L107.3,223.3 A104,104 0 0 1 17.3,103.8 Z" fill="#e08a5f" fill-opacity="0.32" stroke="#f7f6f3" stroke-width="5"/>
+              <text class="sector-label" data-for="qodercli" x="120" y="56" text-anchor="middle" fill="#6155c9">qodercli</text>
+              <text class="sector-label" data-for="codex" x="171" y="166" text-anchor="middle" fill="#1f8e81">codex</text>
+              <text class="sector-label" data-for="claude" x="66" y="162" text-anchor="middle" fill="#b05e30">claude</text>
+              <circle cx="120" cy="120" r="40" fill="#ffffff" stroke="rgba(0,0,0,0.05)"/>
+              <circle cx="120" cy="120" r="4" fill="#98989d"/>
+            </svg>
+          </div>
+        </div>
+        <div class="panel-divider"></div>
+        <div class="panel-card">
+          <div class="card-empty">Hover a sector to preview</div>
+          <div class="card-full">
+            <div class="session-head">
+              <span class="session-name"></span>
+              <span class="session-tty"></span>
+            </div>
+            <div class="session-title"></div>
+            <div class="session-rows">
+              <div class="row row-terminal"><span class="k">Terminal</span><span class="v"></span></div>
+              <div class="row row-draft"><span class="k">Draft</span><span class="v"></span></div>
+            </div>
+            <div class="session-hint"></div>
+          </div>
+        </div>
+      </div>
+      <div class="term" aria-label="Terminal input mock">
+        <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="term-title">claude — zsh — 120×30</span></div>
+        <div class="term-body">
+          <div class="term-line"><span class="prompt">❯ claude</span><span class="typed"></span><span class="cursor"></span></div>
+        </div>
+        <div class="term-hint">↑ Interactive mock: hover / click a sector — the path is inserted at the cursor, never auto-sent</div>
+      </div>
+      <p class="mock-caption">qodercli has an unsent draft → bigger sector, pinned card</p>
+    </div>
+  </div>
+
+  <div class="strip"><span><b>01</b> One-click drop</span><span><b>02</b> Draft-aware sorting</span><span><b>03</b> Dual-channel injection</span><span><b>04</b> Fully local</span></div>
+
+  <section id="how"><span class="eyebrow">From selection to delivery</span><h2>Four steps, one motion.</h2><p class="section-intro">Built for the moment you spot a file in Finder and immediately want the AI to work on it — no typing in between.</p><div class="workflow"><div class="step"><b>01 / FINDER</b><h3>Select files</h3><p>Select one or more files in Finder: code, designs, logs, data files — anything.</p></div><div class="step"><b>02 / ⌃⌥F</b><h3>Summon the disc</h3><p>A global hotkey brings up the halo panel anytime. Default <kbd>⌃⌥F</kbd>, customizable in the menu bar.</p></div><div class="step"><b>03 / HOVER</b><h3>Preview sessions</h3><p>Sectors are colored by CLI. Hover to preview the structured card: task snippet, terminal, unsent draft.</p></div><div class="step"><b>04 / CLICK</b><h3>Path lands</h3><p>Click a sector and the path is inserted at the cursor of the target session — never auto-sent. Whether to hit return is up to you.</p></div></div></section>
+
+  <section id="features"><span class="eyebrow">Designed for parallel sessions</span><h2>Every detail helps you pick the right one.</h2><p class="section-intro">Running several agent sessions at once is the norm. Everything in PieDrop exists to get the file to the right one within a second.</p><div class="grid">
+    <article class="card"><span class="tag">01 / HALO MODE</span><h3>Disc on the left, card on the right</h3><p>A frosted-glass panel: sectors colored by CLI on the left, a structured card for the hovered session on the right — task snippet, terminal, unsent draft.</p></article>
+    <article class="card"><span class="tag">02 / MENU MODE</span><h3>Compact list style</h3><p>Prefer lists? Switch to menu mode — hover to expand the task snippet and draft details. Easier on tight screens.</p></article>
+    <article class="card"><span class="tag">03 / DRAFT-AWARE</span><h3>The one waiting for you, first</h3><p>Sessions with unsent input pin to the top of the list and get a wider sector on the disc — instantly visible among many parallel sessions.</p></article>
+    <article class="card"><span class="tag">04 / SESSION DETECTION</span><h3>Processes × TTY pairing</h3><p><code>ps</code> scans agent processes, precisely paired with terminal windows by TTY. Idle zsh / bash / fish shells work too.</p></article>
+    <article class="card"><span class="tag">05 / DUAL-CHANNEL INJECTION</span><h3>Direct write into iTerm2</h3><p>iTerm2 is written directly, no focus needed; Terminal.app goes through the clipboard + simulated <kbd>⌘V</kbd>. The channel is picked per terminal.</p></article>
+    <article class="card"><span class="tag">06 / LOCAL &amp; CUSTOMIZABLE</span><h3>Data never leaves your Mac</h3><p>No network access, no data collection, no background services. Hotkey, launch-at-login, panel style — all in the menu bar icon.</p></article>
+  </div>
+  <figure class="figure"><img src="screenshot.png" alt="Halo mode screenshot: a frosted disc on the left lists running sessions colored by CLI, the right side shows a structured session card" loading="lazy"><figcaption>Halo mode, real screenshot · generated by the permission-free <code>--demo</code> mode</figcaption></figure>
+  </section>
+
+  <section id="sessions"><span class="eyebrow">Supported sessions</span><h2>The CLIs you already run.</h2><div class="setup">
+    <article><h3>AI CLI sessions</h3><div class="platforms"><span class="platform"><b class="mark" style="background:var(--qodercli)">Q</b>qodercli</span><span class="platform"><b class="mark" style="background:var(--claude)">C</b>claude</span><span class="platform"><b class="mark" style="background:var(--codex)">CX</b>codex</span><span class="platform"><b class="mark" style="background:var(--gemini)">G</b>gemini</span><span class="platform"><b class="mark" style="background:var(--aider)">A</b>aider</span><span class="platform"><b class="mark">q</b>qwen</span><span class="platform"><b class="mark">oc</b>opencode</span><span class="platform"><b class="mark">cr</b>crush</span></div><p>These CLIs are detected automatically via process scanning and shown in their own colors. Other CLI processes may be detected as generic agent sessions too.</p></article>
+    <article><h3>Terminals &amp; injection channels</h3><div class="platforms"><span class="platform"><b class="mark" style="background:#4a9cf0">it</b>iTerm2</span><span class="platform"><b class="mark" style="background:#1d1d1f">T</b>Terminal.app</span><span class="platform"><b class="mark">zsh</b>zsh</span><span class="platform"><b class="mark">bash</b>bash</span><span class="platform"><b class="mark">fish</b>fish</span></div><p>iTerm2 is written directly without stealing focus; Terminal.app goes through the clipboard + simulated <kbd>⌘V</kbd>. Idle shells work as well — for when you're writing <code>cat</code>, <code>open</code>, or <code>grep</code> and don't want to type a path.</p></article>
+  </div><p class="note">Actual support depends on the terminal and CLI versions detected on your machine.</p></section>
+
+  <section id="start"><span class="eyebrow">Get started</span><h2>Up and running in a minute.</h2><div class="install-grid">
+    <div class="install-card">
+      <h3>Download the DMG</h3>
+      <p>Grab the latest <code>PieDrop-x.y.z.dmg</code> from Releases, open it, and drag PieDrop into Applications.</p>
+      <div class="buttons"><a class="button" href="https://github.com/Ezreal777/PieDrop/releases/latest">Download the latest DMG ↗</a></div>
+    </div>
+    <div class="install-card">
+      <h3>Install with Homebrew</h3>
+      <p>A third-party tap is ready to go, one command:</p>
+      <pre class="codeblock"><code>brew install --cask ezreal777/tap/pie-drop
+<span class="cmt"># First install asks you to trust the tap — confirm to proceed</span></code><button class="copy-btn" data-copy data-copied-label="Copied">Copy</button></pre>
+    </div>
+  </div>
+  <h3 class="manual-install-title">First launch needs a one-time approval</h3>
+  <p class="section-intro">The app is signed with a self-built certificate (no paid developer account), so macOS blocks the first launch. After that, rebuilds and upgrades open normally.</p>
+  <ol class="steps-list">
+    <li>Double-click PieDrop; when warned the developer can't be verified, click <strong>Done</strong></li>
+    <li>Open <strong>System Settings → Privacy &amp; Security</strong> and click <strong>Open Anyway</strong> next to the "PieDrop was blocked" note</li>
+    <li>Grant <strong>Accessibility</strong> and <strong>Automation</strong> (Finder / Terminal) permissions when prompted, then you're set</li>
+  </ol>
+  <ul class="perm-list">
+    <li><b>Accessibility</b><span>Simulate <kbd>⌘V</kbd> to paste paths into Terminal.app</span></li>
+    <li><b>Automation (Finder)</b><span>Read the currently selected files</span></li>
+    <li><b>Automation (Terminal · iTerm2)</b><span>Locate session windows and write into the input box</span></li>
+  </ul>
+  <p class="note">The app runs fully locally: no network access, no data collection. Draft preview only reads the last unsent line at the tail of the terminal screen.</p>
+  </section>
+
+  <section><span class="eyebrow">Good to know</span><h2>A few practical questions.</h2><div class="faq">
+    <details><summary>Is the path auto-sent?</summary><p>No. The path is only inserted at the cursor of the target input box — add a sentence, hit return yourself, or delete it. In an idle terminal it simply sits on the command line for you to edit.</p></details>
+    <details><summary>Why Accessibility and Automation permissions?</summary><p>The Terminal.app channel pastes via simulated <kbd>⌘V</kbd> (Accessibility); reading the Finder selection and locating session windows require Automation grants (Finder / Terminal / iTerm2). The iTerm2 channel writes through its own interface and doesn't rely on simulated keys.</p></details>
+    <details><summary>With many sessions open, how do I pick the right one?</summary><p>Sectors are color-coded by CLI; hover any sector and the card on the right shows its task snippet, terminal, and unsent draft. Sessions with drafts also pin to the top and get a bigger sector — usually the one you want to continue.</p></details>
+    <details><summary>Does it collect any data?</summary><p>It runs fully locally: no network access, no data collection, no background services. Draft preview only reads the last unsent input at the tail of the terminal screen, used for session identification and sorting.</p></details>
+  </div></section>
+
+  <div class="closing"><span class="eyebrow">Type one path fewer</span><h2>The next file is one click away.</h2><div class="buttons"><a class="button" href="https://github.com/Ezreal777/PieDrop/blob/main/README.en.md">Read the full README ↗</a><a class="button secondary" href="https://github.com/Ezreal777/PieDrop/issues">Questions &amp; feedback ↗</a></div></div>
+
+</main>
+<footer class="wrap"><span>PieDrop · MIT License</span><div><a href="https://github.com/Ezreal777/PieDrop">Source code</a><a href="https://github.com/Ezreal777/PieDrop/releases">Releases</a><a href="zh.html" lang="zh-CN">中文</a></div></footer>
+</body>
+</html>
