@@ -26,38 +26,39 @@
     </div>
 
     <div class="mock-stack">
-      <div class="panel" aria-label="Halo panel mock">
-        <div class="panel-disc">
-          <div class="disc" role="group" aria-label="Session disc mock, interactive" data-sessions='{"qodercli":{"name":"qodercli","tint":"#8b7cf624","ink":"#6155c9","title":"Refactoring the Injector.swift channels","term":"iTerm2","tty":"ttys004","draft":"update docs/ screenshots to the new panel style","path":"~/Projects/piedrop/docs/screenshot.png","hint":"Click the sector to insert the path into this session"},"codex":{"name":"codex","tint":"#3fc4b426","ink":"#1f8e81","title":"Writing unit tests for SessionDetector","term":"Terminal.app","tty":"ttys002","draft":null,"path":"~/Projects/piedrop/Tests/SessionDetectorTests.swift","hint":"Click the sector to insert the path into this session"},"claude":{"name":"claude","tint":"#e08a5f26","ink":"#b05e30","title":"Reviewing the concurrency changes in PR #12","term":"iTerm2","tty":"ttys001","draft":null,"path":"~/Projects/piedrop/Sources/PieDrop/DraftReader.swift","hint":"Click the sector to insert the path into this session"}}'>
-            <svg viewBox="0 0 240 240">
-              <path class="sector" data-cli="qodercli" tabindex="0" role="button" aria-label="qodercli session, has an unsent draft" d="M120,120 L19.5,93.1 A104,104 0 0 1 220.5,93.1 Z" fill="#8b7cf6" fill-opacity="0.32" stroke="#f7f6f3" stroke-width="5"/>
-              <path class="sector" data-cli="codex" tabindex="0" role="button" aria-label="codex session" d="M120,120 L222.7,103.8 A104,104 0 0 1 118.2,224.0 Z" fill="#3fc4b4" fill-opacity="0.32" stroke="#f7f6f3" stroke-width="5"/>
-              <path class="sector" data-cli="claude" tabindex="0" role="button" aria-label="claude session" d="M120,120 L107.3,223.3 A104,104 0 0 1 17.3,103.8 Z" fill="#e08a5f" fill-opacity="0.32" stroke="#f7f6f3" stroke-width="5"/>
-              <text class="sector-label" data-for="qodercli" x="120" y="56" text-anchor="middle" fill="#6155c9">qodercli</text>
-              <text class="sector-label" data-for="codex" x="171" y="166" text-anchor="middle" fill="#1f8e81">codex</text>
-              <text class="sector-label" data-for="claude" x="66" y="162" text-anchor="middle" fill="#b05e30">claude</text>
-              <circle cx="120" cy="120" r="40" fill="#ffffff" stroke="rgba(0,0,0,0.05)"/>
-              <circle cx="120" cy="120" r="4" fill="#98989d"/>
-            </svg>
-          </div>
-        </div>
-        <div class="panel-divider"></div>
-        <div class="panel-card">
-          <div class="card-empty">Hover a sector to preview</div>
-          <div class="card-full">
-            <div class="session-head">
-              <span class="session-name"></span>
-              <span class="session-tty"></span>
-            </div>
-            <div class="session-title"></div>
-            <div class="session-rows">
-              <div class="row row-terminal"><span class="k">Terminal</span><span class="v"></span></div>
-              <div class="row row-draft"><span class="k">Draft</span><span class="v"></span></div>
-            </div>
-            <div class="session-hint"></div>
-          </div>
-        </div>
-      </div>
+      <svg class="panel-svg" viewBox="0 0 792 320" role="group" aria-label="Halo panel mock, interactive"
+           data-neutral="Hover a sector to preview"
+           data-sessions='{"qodercli":{"fill":"#8b7cf6","ink":"#6156c9","title":"qodercli · piedrop","task":"Refactor the injector | Ready","term":"iTerm2 · ttys004","draft":"summarize this log by day","path":"~/Projects/piedrop/docs/screenshot.png"},"codex":{"fill":"#3fc4b4","ink":"#1f8e82","title":"codex · piedrop","task":"Add unit tests | Ready","term":"Terminal.app · ttys002","draft":null,"path":"~/Projects/piedrop/Tests/SessionDetectorTests.swift"},"claude":{"fill":"#e08a5f","ink":"#b05f30","title":"claude · piedrop","task":"review PR #12 | Ready","term":"iTerm2 · ttys001","draft":null,"path":"~/Projects/piedrop/Sources/PieDrop/DraftReader.swift"}}'>
+        <!-- Panel: "left disc + right card" union outline (unionPath, 1pt = 2px), frosted white + drawn shadow -->
+        <path d="M160,0 A160,160 0 0 0 160,320 L772,320 A20,20 0 0 0 792,300 L792,20 A20,20 0 0 0 772,0 Z" fill="rgba(255,255,255,0.86)" stroke="rgba(0,0,0,0.06)" stroke-width="1"/>
+        <!-- Disc halo (r1 + 6 = 76pt, black 3.5%) -->
+        <circle cx="160" cy="160" r="152" fill="rgba(0,0,0,0.035)"/>
+        <!-- Sectors: annulus r0=34 → r1=70pt, constant 4pt gap, 13% fill; qodercli has a draft → 1.6 weight (160°) -->
+        <path class="pd-sector" data-cli="qodercli" tabindex="0" role="button" aria-label="qodercli session, has an unsent draft" fill="#8b7cf6" fill-opacity="0.13" d="M20.06,156.00 A140,140 0 0 1 290.14,108.37 L222.43,133.02 A68,68 0 0 0 92.11,156.00 Z"/>
+        <path class="pd-sector" data-cli="codex" tabindex="0" role="button" aria-label="codex session" fill="#3fc4b4" fill-opacity="0.13" d="M292.88,115.89 A140,140 0 0 1 188.24,297.13 L175.73,226.16 A68,68 0 0 0 225.16,140.54 Z"/>
+        <path class="pd-sector" data-cli="claude" tabindex="0" role="button" aria-label="claude session" fill="#e08a5f" fill-opacity="0.13" d="M180.36,298.51 A140,140 0 0 1 20.06,164.00 L92.11,164.00 A68,68 0 0 0 167.85,227.55 Z"/>
+        <!-- Sector labels: 11pt medium, at radius 52pt, kept horizontal -->
+        <text class="pd-label" x="141.94" y="57.58" text-anchor="middle" dominant-baseline="central" fill="#6156c9">qodercli</text>
+        <text class="pd-label" x="250.07" y="212" text-anchor="middle" dominant-baseline="central" fill="#1f8e82">codex</text>
+        <text class="pd-label" x="93.15" y="239.67" text-anchor="middle" dominant-baseline="central" fill="#b05f30">claude</text>
+        <!-- Center: plain #F5F5F7 circle + small gray dot -->
+        <circle cx="160" cy="160" r="48" fill="#f5f5f7" stroke="rgba(0,0,0,0.07)" stroke-width="2"/>
+        <circle cx="160" cy="160" r="5" fill="#c7c7cc"/>
+        <!-- Divider: x = 172pt, inset 16pt top/bottom -->
+        <line x1="344" y1="32" x2="344" y2="288" stroke="rgba(0,0,0,0.09)" stroke-width="1"/>
+        <!-- Preview card: color dot + title + divider + Task/Term/Draft rows -->
+        <circle id="pd-dot" cx="405" cy="92" r="9" fill="#8b7cf6" opacity="0"/>
+        <text id="pd-title" class="pd-title" x="396" y="92" dominant-baseline="central">Hover a sector to preview</text>
+        <line id="pd-div" x1="396" y1="124" x2="604" y2="124" stroke="rgba(0,0,0,0.10)" stroke-width="1"/>
+        <g id="pd-rows" opacity="0">
+          <text class="pd-key" x="396" y="151" dominant-baseline="central">Task</text>
+          <text id="pd-task" class="pd-val" x="462" y="151" dominant-baseline="central"></text>
+          <text class="pd-key" x="396" y="191" dominant-baseline="central">Term</text>
+          <text id="pd-term" class="pd-val pd-mono" x="462" y="191" dominant-baseline="central"></text>
+          <text class="pd-key" x="396" y="231" dominant-baseline="central">Draft</text>
+          <text id="pd-draft" class="pd-val pd-mono" x="462" y="231" dominant-baseline="central"></text>
+        </g>
+      </svg>
       <div class="term" aria-label="Terminal input mock">
         <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="term-title">claude — zsh — 120×30</span></div>
         <div class="term-body">
@@ -65,7 +66,7 @@
         </div>
         <div class="term-hint">↑ Interactive mock: hover / click a sector — the path is inserted at the cursor, never auto-sent</div>
       </div>
-      <p class="mock-caption">qodercli has an unsent draft → bigger sector, pinned card</p>
+      <p class="mock-caption">qodercli has an unsent draft → its sector gets 1.6× weight</p>
     </div>
   </div>
 

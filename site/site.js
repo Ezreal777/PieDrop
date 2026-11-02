@@ -1,80 +1,101 @@
-/* PieDrop site interactions: hero disc mock + copy buttons */
+/* PieDrop site interactions: hero panel mock + copy buttons */
 (function () {
   "use strict";
 
-  /* ---- hero disc mock ---- */
-  var disc = document.querySelector(".disc");
-  if (disc) {
-    var card = document.querySelector(".panel-card");
-    var sectors = disc.querySelectorAll(".sector");
+  /* ---- hero panel mock（SVG 复刻 DiskPanel/DialView/PreviewCard）---- */
+  var svg = document.querySelector(".panel-svg");
+  if (svg) {
+    var sessions = null;
+    try { sessions = JSON.parse(svg.getAttribute("data-sessions")); } catch (e) { sessions = null; }
+    var sectors = svg.querySelectorAll(".pd-sector");
+    var titleEl = svg.querySelector("#pd-title");
+    var dotEl = svg.querySelector("#pd-dot");
+    var divEl = svg.querySelector("#pd-div");
+    var rowsEl = svg.querySelector("#pd-rows");
+    var taskEl = svg.querySelector("#pd-task");
+    var termEl = svg.querySelector("#pd-term");
+    var draftEl = svg.querySelector("#pd-draft");
     var typedEl = document.querySelector(".typed");
-    var emptyEl = document.querySelector(".card-empty");
-    var current = null;
     var timer = null;
+    var NEUTRAL = svg.getAttribute("data-neutral") || "悬停扇区查看会话";
+    var CARD_LEAD = 396;   // 卡片内容左缘（14pt × 2）
+    var KEY_W = 56;        // 键列宽（28pt × 2）
+    var KEY_GAP = 10;      // 键值间距（5pt × 2）
+    var DOT_D = 18;        // 色点直径（9pt × 2）
+    var DOT_GAP = 14;      // 点与标题间距（7pt × 2）
+    // NSStackView 整体垂直居中：无 KV 行时标题/分隔线下移重新居中
+    var Y_TITLE_ROW = 92, Y_DIV_ROW = 124;
+    var Y_TITLE_NEUTRAL = 152, Y_DIV_NEUTRAL = 182;
 
-    function esc(s) {
-      return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    // 分隔线宽度 = NSStackView 宽度（最宽的可见行）
+    function stackWidth(withRows) {
+      var w = 0;
+      try {
+        w = titleEl.getComputedTextLength();
+        if (withRows) {
+          [taskEl, termEl, draftEl].forEach(function (el) {
+            w = Math.max(w, KEY_W + KEY_GAP + el.getComputedTextLength());
+          });
+        }
+      } catch (e) {}
+      return w;
     }
 
-    var labels = disc.querySelectorAll(".sector-label");
-
-    function dimLabels(key) {
-      labels.forEach(function (l) {
-        l.classList.toggle("dim", l.getAttribute("data-for") !== key);
-      });
+    function setDivider(withRows) {
+      divEl.setAttribute("x2", (CARD_LEAD + stackWidth(withRows)).toFixed(1));
     }
 
     function show(key) {
-      var s = disc.getAttribute("data-sessions");
-      var sessions;
-      try { sessions = JSON.parse(s); } catch (e) { return; }
-      var data = sessions[key];
-      if (!data || !card) return;
-      current = data;
-      card.classList.add("has-session");
-      emptyEl.style.display = "none";
-      card.querySelector(".session-name").textContent = data.name;
-      card.querySelector(".session-name").style.background = data.tint;
-      card.querySelector(".session-name").style.color = data.ink;
-      card.querySelector(".session-title").textContent = data.title;
-      card.querySelector(".session-tty").textContent = data.term + " · " + data.tty;
-      card.querySelector(".row-terminal .v").textContent = data.term;
-      var draftRow = card.querySelector(".row-draft");
-      if (data.draft) {
-        draftRow.style.display = "";
-        draftRow.querySelector(".v").textContent = data.draft;
-        card.querySelector(".session-hint").textContent = data.hint;
+      if (!sessions) return;
+      var s = sessions[key];
+      if (!s) return;
+      dotEl.setAttribute("fill", s.fill);
+      dotEl.setAttribute("opacity", "1");
+      titleEl.textContent = s.title;
+      titleEl.setAttribute("x", CARD_LEAD + DOT_D + DOT_GAP);
+      titleEl.setAttribute("y", Y_TITLE_ROW);
+      divEl.setAttribute("y1", Y_DIV_ROW);
+      divEl.setAttribute("y2", Y_DIV_ROW);
+      rowsEl.setAttribute("opacity", "1");
+      taskEl.textContent = s.task;
+      taskEl.setAttribute("fill", s.ink);
+      termEl.textContent = s.term;
+      if (s.draft) {
+        draftEl.textContent = "▏" + s.draft + " ▌";
+        draftEl.setAttribute("fill", "#1c1c1f");
       } else {
-        draftRow.style.display = "none";
-        card.querySelector(".session-hint").textContent = data.hintNoDraft || data.hint;
+        draftEl.textContent = "（输入框为空）";
+        draftEl.setAttribute("fill", "#adadb3");
       }
-      dimLabels(key);
+      setDivider(true);
     }
 
     function reset() {
-      if (!card) return;
-      card.classList.remove("has-session");
-      if (emptyEl) emptyEl.style.display = "";
-      current = null;
-      sectors.forEach(function (sec) { sec.classList.remove("dim", "active"); });
-      labels.forEach(function (l) { l.classList.remove("dim"); });
+      sectors.forEach(function (sec) { sec.classList.remove("hover"); });
+      dotEl.setAttribute("opacity", "0");
+      titleEl.textContent = NEUTRAL;
+      titleEl.setAttribute("x", CARD_LEAD);
+      titleEl.setAttribute("y", Y_TITLE_NEUTRAL);
+      divEl.setAttribute("y1", Y_DIV_NEUTRAL);
+      divEl.setAttribute("y2", Y_DIV_NEUTRAL);
+      rowsEl.setAttribute("opacity", "0");
+      setDivider(false);
     }
 
     sectors.forEach(function (sec) {
       var key = sec.getAttribute("data-cli");
-      sec.addEventListener("mouseenter", function () {
-        sectors.forEach(function (o) { if (o !== sec) o.classList.add("dim"); });
-        show(key);
-      });
+      sec.addEventListener("mouseenter", function () { show(key); });
       sec.addEventListener("mouseleave", reset);
       sec.addEventListener("focus", function () { show(key); });
       sec.addEventListener("blur", reset);
       sec.addEventListener("click", function () {
         show(key);
-        sec.classList.add("active");
-        typePath(" " + (current && current.path ? current.path : ""));
+        var s = sessions && sessions[key];
+        typePath(" " + (s && s.path ? s.path : ""));
       });
     });
+
+    reset();
 
     function typePath(path) {
       if (!typedEl) return;

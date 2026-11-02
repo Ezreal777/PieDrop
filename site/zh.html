@@ -26,38 +26,39 @@
     </div>
 
     <div class="mock-stack">
-      <div class="panel" aria-label="光环面板示意">
-        <div class="panel-disc">
-          <div class="disc" role="group" aria-label="会话圆盘示意，可交互" data-sessions='{"qodercli":{"name":"qodercli","tint":"#8b7cf624","ink":"#6155c9","title":"重构 Injector.swift 注入通道","term":"iTerm2","tty":"ttys004","draft":"把 docs/ 里的截图换成新面板样式","path":"~/Projects/piedrop/docs/screenshot.png","hint":"点击扇区，路径会插入到这个会话的输入框"},"codex":{"name":"codex","tint":"#3fc4b426","ink":"#1f8e81","title":"给 SessionDetector 补单元测试","term":"Terminal.app","tty":"ttys002","draft":null,"path":"~/Projects/piedrop/Tests/SessionDetectorTests.swift","hint":"点击扇区，路径会插入到这个会话的输入框"},"claude":{"name":"claude","tint":"#e08a5f26","ink":"#b05e30","title":"review PR #12 的并发改动","term":"iTerm2","tty":"ttys001","draft":null,"path":"~/Projects/piedrop/Sources/PieDrop/DraftReader.swift","hint":"点击扇区，路径会插入到这个会话的输入框"}}'>
-            <svg viewBox="0 0 240 240">
-              <path class="sector" data-cli="qodercli" tabindex="0" role="button" aria-label="qodercli 会话，有未发送草稿" d="M120,120 L19.5,93.1 A104,104 0 0 1 220.5,93.1 Z" fill="#8b7cf6" fill-opacity="0.32" stroke="#f7f6f3" stroke-width="5"/>
-              <path class="sector" data-cli="codex" tabindex="0" role="button" aria-label="codex 会话" d="M120,120 L222.7,103.8 A104,104 0 0 1 118.2,224.0 Z" fill="#3fc4b4" fill-opacity="0.32" stroke="#f7f6f3" stroke-width="5"/>
-              <path class="sector" data-cli="claude" tabindex="0" role="button" aria-label="claude 会话" d="M120,120 L107.3,223.3 A104,104 0 0 1 17.3,103.8 Z" fill="#e08a5f" fill-opacity="0.32" stroke="#f7f6f3" stroke-width="5"/>
-              <text class="sector-label" data-for="qodercli" x="120" y="56" text-anchor="middle" fill="#6155c9">qodercli</text>
-              <text class="sector-label" data-for="codex" x="171" y="166" text-anchor="middle" fill="#1f8e81">codex</text>
-              <text class="sector-label" data-for="claude" x="66" y="162" text-anchor="middle" fill="#b05e30">claude</text>
-              <circle cx="120" cy="120" r="40" fill="#ffffff" stroke="rgba(0,0,0,0.05)"/>
-              <circle cx="120" cy="120" r="4" fill="#98989d"/>
-            </svg>
-          </div>
-        </div>
-        <div class="panel-divider"></div>
-        <div class="panel-card">
-          <div class="card-empty">悬停扇区查看会话</div>
-          <div class="card-full">
-            <div class="session-head">
-              <span class="session-name"></span>
-              <span class="session-tty"></span>
-            </div>
-            <div class="session-title"></div>
-            <div class="session-rows">
-              <div class="row row-terminal"><span class="k">终端</span><span class="v"></span></div>
-              <div class="row row-draft"><span class="k">草稿</span><span class="v"></span></div>
-            </div>
-            <div class="session-hint"></div>
-          </div>
-        </div>
-      </div>
+      <svg class="panel-svg" viewBox="0 0 792 320" role="group" aria-label="光环面板示意，可交互"
+           data-neutral="悬停扇区查看会话"
+           data-sessions='{"qodercli":{"fill":"#8b7cf6","ink":"#6156c9","title":"qodercli · piedrop","task":"重构注入通道 | Ready","term":"iTerm2 · ttys004","draft":"帮我把这份日志按天汇总","path":"~/Projects/piedrop/docs/screenshot.png"},"codex":{"fill":"#3fc4b4","ink":"#1f8e82","title":"codex · piedrop","task":"写单测 | Ready","term":"Terminal.app · ttys002","draft":null,"path":"~/Projects/piedrop/Tests/SessionDetectorTests.swift"},"claude":{"fill":"#e08a5f","ink":"#b05f30","title":"claude · piedrop","task":"review PR #12 | Ready","term":"iTerm2 · ttys001","draft":null,"path":"~/Projects/piedrop/Sources/PieDrop/DraftReader.swift"}}'>
+        <!-- 面板：左圆右方一体轮廓（unionPath，1pt=2px），磨砂白 + 自绘阴影 -->
+        <path d="M160,0 A160,160 0 0 0 160,320 L772,320 A20,20 0 0 0 792,300 L792,20 A20,20 0 0 0 772,0 Z" fill="rgba(255,255,255,0.86)" stroke="rgba(0,0,0,0.06)" stroke-width="1"/>
+        <!-- 圆盘底衬 halo（r1+6=76pt，黑 3.5%） -->
+        <circle cx="160" cy="160" r="152" fill="rgba(0,0,0,0.035)"/>
+        <!-- 扇区：环形 r0=34→r1=70pt，恒定缝宽 4pt，填充 13%；qodercli 有草稿 → 权重 1.6（160°） -->
+        <path class="pd-sector" data-cli="qodercli" tabindex="0" role="button" aria-label="qodercli 会话，有未发送草稿" fill="#8b7cf6" fill-opacity="0.13" d="M20.06,156.00 A140,140 0 0 1 290.14,108.37 L222.43,133.02 A68,68 0 0 0 92.11,156.00 Z"/>
+        <path class="pd-sector" data-cli="codex" tabindex="0" role="button" aria-label="codex 会话" fill="#3fc4b4" fill-opacity="0.13" d="M292.88,115.89 A140,140 0 0 1 188.24,297.13 L175.73,226.16 A68,68 0 0 0 225.16,140.54 Z"/>
+        <path class="pd-sector" data-cli="claude" tabindex="0" role="button" aria-label="claude 会话" fill="#e08a5f" fill-opacity="0.13" d="M180.36,298.51 A140,140 0 0 1 20.06,164.00 L92.11,164.00 A68,68 0 0 0 167.85,227.55 Z"/>
+        <!-- 扇区标签：11pt medium，位于半径 52pt，保持水平 -->
+        <text class="pd-label" x="141.94" y="57.58" text-anchor="middle" dominant-baseline="central" fill="#6156c9">qodercli</text>
+        <text class="pd-label" x="250.07" y="212" text-anchor="middle" dominant-baseline="central" fill="#1f8e82">codex</text>
+        <text class="pd-label" x="93.15" y="239.67" text-anchor="middle" dominant-baseline="central" fill="#b05f30">claude</text>
+        <!-- 中心：素圆 #F5F5F7 + 小灰点 -->
+        <circle cx="160" cy="160" r="48" fill="#f5f5f7" stroke="rgba(0,0,0,0.07)" stroke-width="2"/>
+        <circle cx="160" cy="160" r="5" fill="#c7c7cc"/>
+        <!-- 分隔线：x=172pt，上下缩进 16pt -->
+        <line x1="344" y1="32" x2="344" y2="288" stroke="rgba(0,0,0,0.09)" stroke-width="1"/>
+        <!-- 右侧预览卡：色点 + 标题 + 分隔线 + 任务/终端/草稿 KV -->
+        <circle id="pd-dot" cx="405" cy="92" r="9" fill="#8b7cf6" opacity="0"/>
+        <text id="pd-title" class="pd-title" x="396" y="92" dominant-baseline="central">悬停扇区查看会话</text>
+        <line id="pd-div" x1="396" y1="124" x2="604" y2="124" stroke="rgba(0,0,0,0.10)" stroke-width="1"/>
+        <g id="pd-rows" opacity="0">
+          <text class="pd-key" x="396" y="151" dominant-baseline="central">任务</text>
+          <text id="pd-task" class="pd-val" x="462" y="151" dominant-baseline="central"></text>
+          <text class="pd-key" x="396" y="191" dominant-baseline="central">终端</text>
+          <text id="pd-term" class="pd-val pd-mono" x="462" y="191" dominant-baseline="central"></text>
+          <text class="pd-key" x="396" y="231" dominant-baseline="central">草稿</text>
+          <text id="pd-draft" class="pd-val pd-mono" x="462" y="231" dominant-baseline="central"></text>
+        </g>
+      </svg>
       <div class="term" aria-label="终端输入示意">
         <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="term-title">claude — zsh — 120×30</span></div>
         <div class="term-body">
@@ -65,7 +66,7 @@
         </div>
         <div class="term-hint">↑ 交互示意：悬停 / 点击扇区，路径在光标处插入，不自动发送</div>
       </div>
-      <p class="mock-caption">qodercli 有未发送草稿 → 扇区更大、卡片置顶提示</p>
+      <p class="mock-caption">qodercli 有未发送草稿 → 扇区按 1.6 倍权重加大</p>
     </div>
   </div>
 
